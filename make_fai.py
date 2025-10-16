@@ -58,6 +58,7 @@ def make_fai(path_to_file):
             
             while True:  
                 line=copy.deepcopy(NextLine)
+                lineStart=fasta_file_handle.tell()
                 NextLine=fasta_file_handle.readline().decode('ascii')
                 
                 if not NextLine: # Check if the line is empty (EOF)
@@ -69,18 +70,20 @@ def make_fai(path_to_file):
                     Data_out.append([sequenceID,SequenceLength,sequenceStart,BasesPerLine,BytesPerLine])
                     
                     sequenceID=line[1:].split(' ')[0].replace('\n','').replace('\r','')
-                    sequenceStart=fasta_file_handle.tell()
-                    line = fasta_file_handle.readline().decode('ascii')
-                    BytesPerLine=len(line)
-                    line=line.strip()
-                    BasesPerLine=len(line)
-                    SequenceLength=len(line)
+                    sequenceStart=lineStart
+                    BytesPerLine=len(NextLine)
+                    NextLine=NextLine.strip()
+                    BasesPerLine=len(NextLine)
+                    SequenceLength=len(NextLine)
+                    NextLine=fasta_file_handle.readline().decode('ascii')
                     
                 else:
                     if len(line) != BytesPerLine and NextLine[:1] != ">": 
+                        print(line)
                         raise Exception
                     line=line.strip()
                     if BasesPerLine != len(line) and NextLine[:1] != ">":
+                        print(line)
                         raise Exception
                     SequenceLength+=len(line)
                             
@@ -90,5 +93,5 @@ def make_fai(path_to_file):
 
     except: #if file can not be opened create a file
         raise Exception("could not process Fasta File")
-        raise Exception("File or index could not be opened or does not exist")
+        #raise Exception("File or index could not be opened or does not exist")
     
