@@ -69,6 +69,8 @@ class FASTA_IO:
     
         """
         try: #try to open the file
+            self.fasta_file_handle=''
+            self.fai_file_handle=''
             self.path_to_fasta_file=path_to_file
             self.path_to_fai_file=path_to_file+'.fai'
             if self.os.path.exists(self.path_to_fasta_file) and  self.os.path.exists(self.path_to_fai_file):
@@ -83,9 +85,16 @@ class FASTA_IO:
             self.__read_in_fai__()
         except:
             raise Exception("Could not process index")
+        
+    def close(self):
+        """Close the file handles."""
+        if self.fasta_file_handle!= '':
+            self.fasta_file_handle.close() 
+        if self.fai_file_handle!= '':
+            self.fai_file_handle.close() 
+
     def __del__(self): #When object is deleted closes the connection to the file
-        self.fasta_file_handle.close() 
-        self.fai_file_handle.close() 
+        self.close()
 
     def __eq__(self,other): # test if two IO objects are the same by comparing the file name will return true or false
         return self.path_to_files == other # compare file names
@@ -161,7 +170,7 @@ class FASTA_IO:
             
         try: # get data start to stop
             number_of_new_line_at_start=(StartBase)//BasesPerLine
-            number_of_new_line_at_stop=(StopBase)//BasesPerLine
+            number_of_new_line_at_stop=(StopBase-1)//BasesPerLine
             additional_bytes=(number_of_new_line_at_stop-number_of_new_line_at_start)*ByteTail
             length_to_read=StopBase-StartBase
             File_handle.seek(StartBase+SequenceStart+(number_of_new_line_at_start*ByteTail),0)
@@ -240,7 +249,7 @@ class FASTA_IO:
         """
           
         
-        self.overwrite_section(SequenceID,min(StartBase,StopBase),self.read_in_section(self,SequenceID,min(StartBase,StopBase),max(StartBase,StopBase)).lower())
+        self.overwrite_section(SequenceID,min(StartBase,StopBase),self.read_in_section(SequenceID,min(StartBase,StopBase),max(StartBase,StopBase)).lower())
         
         
     def hard_mask_region(self,SequenceID,StartBase,StopBase):
