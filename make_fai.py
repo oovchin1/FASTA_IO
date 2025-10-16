@@ -47,7 +47,7 @@ def make_fai(path_to_file):
             if line[:1] != ">":
                 raise Exception()
                 
-            sequenceID=line[1:].split(' ')[0]
+            sequenceID=line[1:].split(' ')[0].replace('\n','').replace('\r','')
             sequenceStart=fasta_file_handle.tell()
             line = fasta_file_handle.readline().decode('ascii')
             BytesPerLine=len(line)
@@ -68,7 +68,7 @@ def make_fai(path_to_file):
                 if line[:1] == ">":
                     Data_out.append([sequenceID,SequenceLength,sequenceStart,BasesPerLine,BytesPerLine])
                     
-                    sequenceID=line[1:].split(' ')[0]
+                    sequenceID=line[1:].split(' ')[0].replace('\n','').replace('\r','')
                     sequenceStart=fasta_file_handle.tell()
                     line = fasta_file_handle.readline().decode('ascii')
                     BytesPerLine=len(line)
